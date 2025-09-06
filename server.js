@@ -25,7 +25,7 @@ app.get('/pulkit', (req, res) => {
         <span style="color: blue;">Deployment</span>
         <span style="color: green;">has</span>
         <span style="color: orange;">been</span>
-        <span style="color: purple;">successful!</span>
+        <span style="color: purple;">Successful!</span>
       </marquee>
     </div>
     <div style="text-align: center; margin-top: 40px;">

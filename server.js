@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 
 app.get('/pulkit', (req, res) => {
   res.send(`
-    <div style="font-size: 90px; text-align: center;">
+    <div style="font-size: 95px; text-align: center;">
       <marquee behavior="scroll" direction="left" scrollamount="15">
         <span style="color: red;">You</span>
         <span style="color: blue;">have</span>

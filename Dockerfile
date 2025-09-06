@@ -6,8 +6,8 @@ COPY . .
 
 FROM node:18-alpine
 WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/index.js .
-COPY --from=builder /app/package.json .
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/index.js .
+COPY --from=build /app/package.json .
 EXPOSE 8080
 CMD ["npm", "start"]

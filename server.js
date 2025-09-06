@@ -28,6 +28,9 @@ app.get('/pulkit', (req, res) => {
         <span style="color: purple;">successful!</span>
       </marquee>
     </div>
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="https://www.youtube.com">Click here to go to YouTube</a>
+    </div>
   `);
 });
 

@@ -1,0 +1,102 @@
+name: Deploy to AWS App Runner
+on:
+  push:
+    branches: 
+        - main
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  APP_RUNNER_SERVICE_NAME: ${{ vars.APP_RUNNER_SERVICE_NAME }}
+  IAM_GITHUB_OIDC_ROLE: ${{ vars.IAM_GITHUB_OIDC_ROLE }}
+  IAM_ECR_ACCESS_ROLE_ARN: ${{ vars.IAM_ECR_ACCESS_ROLE_ARN }}
+  IMAGE_TAG: ${{ github.sha }}
+  ECR_URI: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.IAM_GITHUB_OIDC_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and tag the Docker image
+        id: build-image
+        run: |
+          docker build -t {{ env.ECR_URI }}:${{ env.IMAGE_TAG }} .
+          docker tag ${{ env.ECR_URI }}:${IMAGE_TAG}" ${{ env.ECR_URI }}:latest"
+
+      - name: Push image to Amazon ECR
+        run: |
+          docker push ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }}
+          docker push ${{ env.ECR_URI }}:latest"
+
+      - name: Create or update App runner service
+        # a bash script to make the deployment idempotent(means: run the same command multiple times, and it will only have an effect the first time)
+        shell: bash
+        run: |
+            set -euo pipefail
+
+            # Check if the service already exists
+            SVC_ARN=$(aws apprunner list-services \
+            --query "ServiceSummaryList[?ServiceName=='${{ env.APP_RUNNER_SERVICE_NAME }}'].ServiceArn | [0]" \
+            --output text)
+
+            # Prepare the source configuration in JSON format
+            SRC_CONFIG=$(cat <<JSON
+            {
+                "ImageRepository": {
+                    "ImageIdentifier": "${{ env.ECR_URI }}:latest",
+                    "ImageRepositoryType": "ECR",
+                    "ImageConfiguration": {
+                        "Port": 8080,
+                        "RuntimeEnvironmentVariables": [
+                            {"Name": "APP_ENV", "Value":"pulkit_production"}
+                        ]
+                    }
+                },
+                "AuthenticationConfiguration": {
+                    "Type": "AWS",
+                    "AwsAccountRoleId": "${{ env.IAM_ECR_ACCESS_ROLE_ARN }}",
+                    },
+                    "AutoDeploymentsEnabled": true
+            }
+            JSON
+            )
+
+            # Conditionally create or update the service
+            if [ "$SVC_ARN" = "None" ] || [ -z "$SVC_ARN" ]; then
+                aws apprunner create-service \
+                --service-name "${{ env.APP_RUNNER_SERVICE_NAME }}" \
+                --source-configuration "$SRC_CONFIG" \
+                --health-check-configuration "Protocol=HTTP, Path=/healthz,Interval=10,Timeout=5,HealthyThreshold=1,UnhealthyThreshold=3"
+            else
+                aws apprunner update-service \
+                    --service-arn "${ SVC_ARN }" \
+                    --source-configuration "$SRC_CONFIG" \ }"
+
+            fi
+
+      - name: Show Service URL
+        # Queries the service and prints its public URL to the logs
+        run: |
+            aws apprunner list-services \
+            --query "ServiceSummaryList[?ServiceName=='${{ env.APP_RUNNER_SERVICE_NAME }}'].ServiceUrl | [0]" \
+            --output text
+            

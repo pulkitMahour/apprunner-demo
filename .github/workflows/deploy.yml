@@ -1,8 +1,9 @@
 name: Deploy to AWS App Runner
+
 on:
   push:
     branches: 
-        - main
+      - main
 
 permissions:
   id-token: write
@@ -39,16 +40,17 @@ jobs:
       - name: Build and tag the Docker image
         id: build-image
         run: |
-          docker build -t {{ env.ECR_URI }}:${{ env.IMAGE_TAG }} .
-          docker tag ${{ env.ECR_URI }}:${IMAGE_TAG}" ${{ env.ECR_URI }}:latest"
+          docker build -t ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }} .
+          # Removed the incorrect trailing double quote "
+          docker tag ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }} ${{ env.ECR_URI }}:latest
 
       - name: Push image to Amazon ECR
         run: |
           docker push ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }}
-          docker push ${{ env.ECR_URI }}:latest"
+          # Removed the incorrect trailing double quote "
+          docker push ${{ env.ECR_URI }}:latest
 
       - name: Create or update App runner service
-        # a bash script to make the deployment idempotent(means: run the same command multiple times, and it will only have an effect the first time)
         shell: bash
         run: |
             set -euo pipefail
@@ -59,7 +61,7 @@ jobs:
             --output text)
 
             # Prepare the source configuration in JSON format
-            SRC_CONFIG=$(cat <<JSON
+            SRC_CFG=$(cat <<JSON
             {
                 "ImageRepository": {
                     "ImageIdentifier": "${{ env.ECR_URI }}:latest",
@@ -72,10 +74,9 @@ jobs:
                     }
                 },
                 "AuthenticationConfiguration": {
-                    "Type": "AWS",
-                    "AwsAccountRoleId": "${{ env.IAM_ECR_ACCESS_ROLE_ARN }}",
-                    },
-                    "AutoDeploymentsEnabled": true
+                    "AccessRoleArn": "${{ env.IAM_ECR_ACCESS_ROLE_ARN }}"
+                },
+                "AutoDeploymentsEnabled": true
             }
             JSON
             )
@@ -84,19 +85,16 @@ jobs:
             if [ "$SVC_ARN" = "None" ] || [ -z "$SVC_ARN" ]; then
                 aws apprunner create-service \
                 --service-name "${{ env.APP_RUNNER_SERVICE_NAME }}" \
-                --source-configuration "$SRC_CONFIG" \
-                --health-check-configuration "Protocol=HTTP, Path=/healthz,Interval=10,Timeout=5,HealthyThreshold=1,UnhealthyThreshold=3"
+                --source-configuration "$SRC_CFG" \
+                --health-check-configuration "Protocol=HTTP,Path=/healthz,Interval=10,Timeout=5,HealthyThreshold=1,UnhealthyThreshold=3"
             else
                 aws apprunner update-service \
-                    --service-arn "${ SVC_ARN }" \
-                    --source-configuration "$SRC_CONFIG" \ }"
-
+                    --service-arn "${SVC_ARN}" \
+                    --source-configuration "$SRC_CFG"
             fi
 
       - name: Show Service URL
-        # Queries the service and prints its public URL to the logs
         run: |
             aws apprunner list-services \
             --query "ServiceSummaryList[?ServiceName=='${{ env.APP_RUNNER_SERVICE_NAME }}'].ServiceUrl | [0]" \
             --output text
-            

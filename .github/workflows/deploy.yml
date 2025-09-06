@@ -67,8 +67,7 @@ jobs:
                     "ImageConfiguration": {
                         "Port": "8080",
                         "RuntimeEnvironmentVariables":{
-                            "Name": "APP_ENV",
-                            "Value":"pulkit_production"
+                            "APP_ENV":"pulkit_production"
                         }
                     }
                 },

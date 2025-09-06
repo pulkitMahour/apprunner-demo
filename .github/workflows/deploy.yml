@@ -41,13 +41,11 @@ jobs:
         id: build-image
         run: |
           docker build -t ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }} .
-          # Removed the incorrect trailing double quote "
           docker tag ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }} ${{ env.ECR_URI }}:latest
 
       - name: Push image to Amazon ECR
         run: |
           docker push ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }}
-          # Removed the incorrect trailing double quote "
           docker push ${{ env.ECR_URI }}:latest
 
       - name: Create or update App runner service
@@ -67,7 +65,7 @@ jobs:
                     "ImageIdentifier": "${{ env.ECR_URI }}:latest",
                     "ImageRepositoryType": "ECR",
                     "ImageConfiguration": {
-                        "Port": 8080,
+                        "Port": "8080",
                         "RuntimeEnvironmentVariables": [
                             {"Name": "APP_ENV", "Value":"pulkit_production"}
                         ]

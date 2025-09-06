@@ -29,7 +29,7 @@ app.get('/pulkit', (req, res) => {
       </marquee>
     </div>
     <div style="text-align: center; margin-top: 40px;">
-      <a href="https://www.youtube.com">Click here to go to YouTube</a>
+      <a href="https://www.youtube.com" target="_blank">Click here to go to YouTube</a>
     </div>
   `);
 });

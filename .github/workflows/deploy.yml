@@ -95,7 +95,7 @@ jobs:
                 aws apprunner update-service \
                     --service-arn "${SVC_ARN}" \
                     --source-configuration "$SRC_CFG" \
-                    --instance-configuration "InstanceRoleArn=${{ env.IAM_APP_RUNNER_TASK_ROLE_ARN }}" \
+                    --instance-configuration "InstanceRoleArn=${{ env.IAM_APP_RUNNER_TASK_ROLE_ARN }}"
             fi
 
       - name: Show Service URL

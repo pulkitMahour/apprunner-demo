@@ -18,6 +18,8 @@ env:
   IAM_ECR_ACCESS_ROLE_ARN: ${{ vars.IAM_ECR_ACCESS_ROLE_ARN }}
   IMAGE_TAG: ${{ github.sha }}
   ECR_URI: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}
+  IAM_APP_RUNNER_TASK_ROLE_ARN: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/PAppRunnerDemoTaskRole
+  SECRET_ARN: ${{ vars.SECRET_ARN }}
 
 
 jobs:
@@ -67,7 +69,8 @@ jobs:
                     "ImageConfiguration": {
                         "Port": "8080",
                         "RuntimeEnvironmentVariables":{
-                            "APP_ENV":"pulkit_production"
+                          "Name": "APP_SECRET",
+                          "Value": "${{ env.SECRET_ARN}}"
                         }
                     }
                 },
@@ -84,11 +87,13 @@ jobs:
                 aws apprunner create-service \
                 --service-name "${{ env.APP_RUNNER_SERVICE_NAME }}" \
                 --source-configuration "$SRC_CFG" \
+                --instance-configuration "RoleArn=${{ env.IAM_APP_RUNNER_TASK_ROLE_ARN }}" \
                 --health-check-configuration "Protocol=HTTP,Path=/healthz,Interval=10,Timeout=5,HealthyThreshold=1,UnhealthyThreshold=3"
             else
                 aws apprunner update-service \
                     --service-arn "${SVC_ARN}" \
                     --source-configuration "$SRC_CFG"
+                    --instance-configuration "RoleArn=${{ env.IAM_APP_RUNNER_TASK_ROLE_ARN }}"
             fi
 
       - name: Show Service URL

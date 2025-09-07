@@ -87,13 +87,13 @@ jobs:
                 aws apprunner create-service \
                 --service-name "${{ env.APP_RUNNER_SERVICE_NAME }}" \
                 --source-configuration "$SRC_CFG" \
-                --instance-configuration "RoleArn=${{ env.IAM_APP_RUNNER_TASK_ROLE_ARN }}" \
+                --instance-configuration "InstanceRoleArn=${{ env.IAM_APP_RUNNER_TASK_ROLE_ARN }}" \
                 --health-check-configuration "Protocol=HTTP,Path=/healthz,Interval=10,Timeout=5,HealthyThreshold=1,UnhealthyThreshold=3"
             else
                 aws apprunner update-service \
                     --service-arn "${SVC_ARN}" \
                     --source-configuration "$SRC_CFG"
-                    --instance-configuration "RoleArn=${{ env.IAM_APP_RUNNER_TASK_ROLE_ARN }}"
+                    --instance-configuration "InstanceRoleArn=${{ env.IAM_APP_RUNNER_TASK_ROLE_ARN }}"
             fi
 
       - name: Show Service URL

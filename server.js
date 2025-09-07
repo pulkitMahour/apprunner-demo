@@ -4,13 +4,14 @@ const port = process.env.PORT || 8080;
 const appName = 'apprunner-demo';
 const appEnv = process.env.APP_ENV;
 const appSecret = process.env.APP_SECRET;
+const secretObject = JSON.parse(appSecret);
 
 app.get('/healthz', (req, res) => {
   res.send('ok  try "/pulkit" endpoint');
 });
 
 app.get('/', (req, res) => {
-  res.json({ name: appName, env: appEnv, secret: appSecret });
+  res.json({ name: appName, env: appEnv, secret: secretObject.APP_SECRET });
 });
 
 app.get('/pulkit', (req, res) => {
@@ -36,5 +37,5 @@ app.get('/pulkit', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`${appName} (${appEnv}) listening on port ${port}. Secret is: ${appSecret}`);
+  console.log(`${appName} (${appEnv}) listening on port ${port}. Secret is: ${secretObject.APP_SECRET}`);
 });

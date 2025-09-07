@@ -69,8 +69,7 @@ jobs:
                     "ImageConfiguration": {
                         "Port": "8080",
                         "RuntimeEnvironmentVariables":{
-                          "Name": "APP_SECRET",
-                          "Value": "${{ env.SECRET_ARN}}"
+                          "APP_SECRET": "${{ env.SECRET_ARN}}"
                         }
                     }
                 },

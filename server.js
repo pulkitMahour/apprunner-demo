@@ -36,5 +36,5 @@ app.get('/pulkit', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`${appName} (${appEnv}) listening on port ${port}`);
+  console.log(`${appName} (${appEnv}) listening on port ${port}. Secret is: ${appSecret}`);
 });

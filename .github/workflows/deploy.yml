@@ -93,9 +93,9 @@ jobs:
                 --health-check-configuration "Protocol=HTTP,Path=/healthz,Interval=10,Timeout=5,HealthyThreshold=1,UnhealthyThreshold=3"
             else
                 aws apprunner update-service \
-                    --service-arn "${SVC_ARN}" \
-                    --instance-configuration "InstanceRoleArn=${{ env.IAM_APP_RUNNER_TASK_ROLE_ARN }}"  \
-                    --source-configuration "$SRC_CFG"
+                --service-arn "${SVC_ARN}" \
+                --instance-configuration "InstanceRoleArn=${{ env.IAM_APP_RUNNER_TASK_ROLE_ARN }}"  \
+                --source-configuration "$SRC_CFG"
             fi
 
       - name: Show Service URL

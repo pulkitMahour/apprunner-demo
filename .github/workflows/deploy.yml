@@ -43,12 +43,7 @@ jobs:
         id: build-image
         run: |
           docker build -t ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }} .
-
-      - name: Tag Docker image
-        id: tag-image
-        run: |
-          docker tag ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }}
-          docker tag ${{ env.ECR_REPOSITORY }}:latest ${{ env.ECR_URI }}:latest
+          docker tag ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }} ${{ env.ECR_URI }}:latest
 
       - name: Push image to Amazon ECR
         run: |

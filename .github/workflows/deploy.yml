@@ -64,7 +64,7 @@ jobs:
             SRC_CFG=$(cat <<JSON
             {
                 "ImageRepository": {
-                    "ImageIdentifier": "${{ env.ECR_URI }}:latest",
+                    "ImageIdentifier": "${{ env.ECR_URI }}:${{ env.IMAGE_TAG }}",
                     "ImageRepositoryType": "ECR",
                     "ImageConfiguration": {
                         "Port": "8080",

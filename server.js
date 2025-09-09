@@ -8,8 +8,6 @@ const app = express();
 const port = process.env.PORT || 8080;
 const appName = "apprunner-demo";
 const appEnv = process.env.APP_ENV;
-// const appSecret = process.env.APP_SECRET;
-// const secretObject = JSON.parse(appSecret);
 
 const secretName = "apprunner/pulkit-demo/config";
 const client = new SecretsManagerClient({ region: process.env.AWS_REGION });

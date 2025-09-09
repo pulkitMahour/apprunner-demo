@@ -70,9 +70,6 @@ jobs:
                         "Port": "8080",
                         "RuntimeEnvironmentVariables":{
                           "APP_ENV": "pulkit_production"
-                        },
-                        "RuntimeEnvironmentSecrets": {
-                          "APP_SECRET": "${{ env.SECRET_ARN}}"
                         }
                     }
                 },

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>App Home</title>
+    </head>
+    <body>
+        <h2>App Info</h2>
+        <p><b>Name:</b> <span id="name">loading...</span></p>
+        <p><b>Env:</b> <span id="env">loading...</span></p>
+        <p><b>Secret:</b> <span id="secret">loading...</span></p>
+
+        <h2>Navigation</h2>
+        <button onclick="window.location.href='/upload.html'">
+            Go to Upload Page
+        </button>
+
+        <script>
+            async function loadInfo() {
+            try {
+                const res = await fetch("/api/info");
+                const data = await res.json();
+                document.getElementById("name").textContent = data.name;
+                document.getElementById("env").textContent = data.env;
+                document.getElementById("secret").textContent = data.secret;
+            } catch (err) {
+                document.getElementById("name").textContent = "Error loading info";
+            }
+            }
+            loadInfo();
+        </script>
+    </body>
+</html>

@@ -70,7 +70,7 @@ async function startServer() {
 			}
 			
 			const filename = req.file.originalname.replace(/\s+/g, '-');
-			const key = `${Date.now()}-${filename}`;
+			const key = `${appName}/${Date.now()}-${filename}`;
 			
 			const putCmd = new PutObjectCommand({
 				Bucket: S3_BUCKET,
@@ -87,7 +87,7 @@ async function startServer() {
 				Key: key
 			});
 
-			const signedUrl = await getSignedUrl(s3Client, getCmd, { expiresIn: 3600 });
+			const signedUrl = await getSignedUrl(s3Client, getCmd, { expiresIn: 60 });
 
 			return res.json({key, url: signedUrl});
 		} 
@@ -112,6 +112,33 @@ async function startServer() {
 		catch (error) {
 			console.error("Error getting file:", error);
 			return res.status(404).send("File not found");
+		}
+	});
+
+	app.get("/list", async (req, res) => {
+		try {
+			const data = await s3Client.send(new ListObjectsV2Command({ Bucket: S3_BUCKET, Prefix: `${appName}/` }));
+
+			if (!data.Contents || data.Contents.length === 0) {
+				return res.send("<h2>No files found</h2>");
+			}
+
+			const files = await Promise.all(
+				data.Contents.map(async (item) => {
+					const getCmd = new GetObjectCommand({
+						Bucket: S3_BUCKET,
+						Key: item.Key
+					});
+					const signedUrl = await getSignedUrl(s3Client, getCmd, { expiresIn: 60 });
+					return { key: item.Key, url: signedUrl };
+				})
+			);
+
+			res.json(files);
+		} 
+		catch (error) {
+			console.error("Error listing files:", error);
+			return res.status(500).json({error:"Error listing files"});
 		}
 	});
 

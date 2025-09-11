@@ -7,13 +7,20 @@
     <body>
         <h2>Upload a File</h2>
         <form id="uploadForm">
-            <input type="file" id="fileInput" name="file" style="display: block; margin: 20px;"/>
-            <button type="submit" style="display: block; margin: 20px;">Upload</button>
+        <input
+            type="file"
+            id="fileInput"
+            name="file"
+            style="display: block; margin: 20px"
+        />
+        <button type="submit" style="display: block; margin: 20px">Upload</button>
         </form>
         <p id="status"></p>
         <p id="link"></p>
         <script>
-        document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+        document
+            .getElementById("uploadForm")
+            .addEventListener("submit", async (e) => {
             e.preventDefault();
             const fileInput = document.getElementById("fileInput");
             if (!fileInput.files.length) {
@@ -26,29 +33,64 @@
 
             try {
                 const res = await fetch("/upload", {
-                    method: "POST",
-                    body: formData,
+                method: "POST",
+                body: formData,
                 });
 
                 if (!res.ok) {
-                    const errorText = await res.text();
-                    throw new Error(errorText || `Upload failed with status ${res.status}`);
+                const errorText = await res.text();
+                throw new Error(
+                    errorText || `Upload failed with status ${res.status}`,
+                );
                 }
 
                 const data = await res.json();
-                document.getElementById("status").textContent = "✅ Upload successful!";
+                document.getElementById("status").textContent =
+                "✅ Upload successful!";
                 document.getElementById("link").innerHTML = `
-                <p>
-                    <a href="${data.url}" target="_blank">View via Signed URL</a>
-                </p>
-                <p>
-                    <a href="/files/${data.key}" target="_blank">View via App Route</a>
-                </p>`;
+                    <p>
+                        View via Signed URL: <a href="${data.url}" target="_blank">${data.url}</a>
+                    </p>
+                    <p>
+                        View via App Route: <a href="/files/${data.key}" target="_blank">${window.location.origin}/files/${data.key}</a>
+                    </p>`;
             } catch (err) {
-                document.getElementById("status").textContent = "❌ Upload failed: " + err;
+                document.getElementById("status").textContent =
+                "❌ Upload failed: " + err;
                 document.getElementById("link").innerHTML = "";
             }
-        });
+            });
+        </script>
+        <h3>Uploaded Files</h3>
+        <ul id="fileList"></ul>
+        <script>
+        async function loadFiles() {
+            const res = await fetch("/list");
+            const files = await res.json();
+
+            const list = document.getElementById("fileList");
+            list.innerHTML = "";
+
+            if (files.length === 0) {
+            list.innerHTML = "<li>No files uploaded yet.</li>";
+            return;
+            }
+
+            files.forEach((file) => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                    <p><b>Filename:</b> ${file.originalName}</p>
+                    <p>
+                        View via Signed URL: <a href="${file.url}" target="_blank">${file.url}</a>
+                    </p>
+                    <p>
+                        View via App Route: <a href="/files/${file.key}" target="_blank">${window.location.origin}/files/${file.key}</a>
+                    </p>
+                    `;
+            list.appendChild(li);
+            });
+        }
+        loadFiles();
         </script>
     </body>
 </html>

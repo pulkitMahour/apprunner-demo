@@ -130,12 +130,11 @@ async function startServer() {
 						Key: item.Key
 					});
 					const signedUrl = await getSignedUrl(s3Client, getCmd, { expiresIn: 60 });
-					return { key: item.Key, url: signedUrl };
+					return { key: item.Key, url: signedUrl, originalName: item.Key.split('/').pop() };
 				})
 			);
 
-			const files_array = data.Contents ? data.Contents.map(obj => obj.Key) : [];
-			res.json(files_array);
+			res.json(files);
 		} 
 		catch (error) {
 			console.error("Error listing files:", error);

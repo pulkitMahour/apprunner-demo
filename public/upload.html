@@ -46,7 +46,7 @@
 
                 const data = await res.json();
                 document.getElementById("status").textContent =
-                "✅ Upload successful! Link will expire in 60 seconds.";
+                "✅ Upload successful! Links will be expired in 60 seconds.";
                 document.getElementById("link").innerHTML = `
                     <p>
                         View via Signed URL: <a href="${data.url}" target="_blank">${data.url}</a>
@@ -62,7 +62,7 @@
             });
         </script>
         <h2>Uploaded Files</h2>
-        <p>Note: All the links will expire in 60 seconds.</p>
+        <p>Note: All the links will be expired in 60 seconds.</p>
         <ul id="fileList"></ul>
         <script>
         async function loadFiles() {
@@ -80,7 +80,6 @@
             files.forEach((file) => {
             const li = document.createElement("li");
             li.innerHTML = `
-                    <p><b>Filename:</b> ${file.originalName}</p>
                     <p>
                         View via Signed URL: <a href="${file.url}" target="_blank">${file.url}</a>
                     </p>

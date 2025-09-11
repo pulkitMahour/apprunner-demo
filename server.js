@@ -70,7 +70,7 @@ async function startServer() {
 			}
 			
 			const filename = req.file.originalname.replace(/\s+/g, '-');
-			const key = `${appName}/${Date.now()}-${filename}`;
+			const key = `${Date.now()}-${filename}`;
 			
 			const putCmd = new PutObjectCommand({
 				Bucket: S3_BUCKET,
@@ -99,7 +99,7 @@ async function startServer() {
 
 	app.get("/files/:key", async (req, res) => {
 		try {
-			const key = `${appName}/${req.params.key}`;
+			const key = req.params.key;
 
 			const getCmd = new GetObjectCommand({
 				Bucket: S3_BUCKET,
@@ -117,10 +117,10 @@ async function startServer() {
 
 	app.get("/list", async (req, res) => {
 		try {
-			const data = await s3Client.send(new ListObjectsV2Command({ Bucket: S3_BUCKET, Prefix: `${appName}/` }));
+			const data = await s3Client.send(new ListObjectsV2Command({ Bucket: S3_BUCKET }));
 
 			if (!data.Contents || data.Contents.length === 0) {
-				return res.send("<h2>No files found</h2>");
+				return res.json([]);
 			}
 
 			const files = await Promise.all(
@@ -130,7 +130,7 @@ async function startServer() {
 						Key: item.Key
 					});
 					const signedUrl = await getSignedUrl(s3Client, getCmd, { expiresIn: 60 });
-					return { key: item.Key, url: signedUrl, originalName: item.Key.split('/').pop() };
+					return { key: item.Key, url: signedUrl };
 				})
 			);
 

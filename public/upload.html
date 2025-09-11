@@ -46,7 +46,7 @@
 
                 const data = await res.json();
                 document.getElementById("status").textContent =
-                "✅ Upload successful!";
+                "✅ Upload successful! Link will expire in 60 seconds.";
                 document.getElementById("link").innerHTML = `
                     <p>
                         View via Signed URL: <a href="${data.url}" target="_blank">${data.url}</a>
@@ -61,7 +61,8 @@
             }
             });
         </script>
-        <h3>Uploaded Files</h3>
+        <h2>Uploaded Files</h2>
+        <p>Note: All the links will expire in 60 seconds.</p>
         <ul id="fileList"></ul>
         <script>
         async function loadFiles() {
@@ -72,8 +73,8 @@
             list.innerHTML = "";
 
             if (files.length === 0) {
-            list.innerHTML = "<li>No files uploaded yet.</li>";
-            return;
+                list.innerHTML = "<li>No files uploaded yet.</li>";
+                return;
             }
 
             files.forEach((file) => {

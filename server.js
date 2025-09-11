@@ -99,7 +99,7 @@ async function startServer() {
 
 	app.get("/files/:key", async (req, res) => {
 		try {
-			const key = req.params.key;
+			const key = `${appName}/${req.params.key}`;
 
 			const getCmd = new GetObjectCommand({
 				Bucket: S3_BUCKET,
@@ -134,7 +134,8 @@ async function startServer() {
 				})
 			);
 
-			res.json(files);
+			const files_array = data.Contents ? data.Contents.map(obj => obj.Key) : [];
+			res.json(files_array);
 		} 
 		catch (error) {
 			console.error("Error listing files:", error);

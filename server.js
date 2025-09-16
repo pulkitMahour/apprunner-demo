@@ -142,7 +142,7 @@ async function startServer() {
 		}
 	});
 
-	app.listen(port, () => {
+	app.listen(port, "0.0.0.0", () => {
 		console.log(`${appName} (${appEnv}) listening on port ${port}`);
 		console.log(`Secret value is: ${appSecretValue}`);
 	});

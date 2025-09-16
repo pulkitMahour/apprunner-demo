@@ -1,0 +1,32 @@
+{
+    "family": "my-nodejs-task",
+    "networkMode": "awsvpc",
+    "executionRoleArn": "arn:aws:iam::604100153348:role/PecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::604100153348:role/PecsTaskRole",
+    "cpu": "512",
+    "memory": "2048",
+    "requiresCompatibilities": ["FARGATE"],
+    "containerDefinitions": [
+        {
+            "name": "my-app",
+            "image": "nginx:latest", 
+            "cpu": 0,
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 8080,
+                    "hostPort": 8080
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/my-nodejs-task",
+                    "awslogs-create-group": "true",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ]
+}

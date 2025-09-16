@@ -37,8 +37,10 @@ jobs:
       - name: Build and tag the Docker image
         id: build-image
         run: |
-          docker build -t ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }} .
-          docker tag ${{ env.ECR_URI }}:${{ env.IMAGE_TAG }} ${{ env.ECR_URI }}:latest
+          IMAGE=${{ env.ECR_URI }}:${{ env.IMAGE_TAG }}
+          docker build -t $IMAGE .
+          docker tag $IMAGE ${{ env.ECR_URI }}:latest
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
       - name: Push image to Amazon ECR
         run: |
@@ -64,6 +66,7 @@ jobs:
               "containerDefinitions": [
                 {
                   "name": "my-app",
+                  "image": "${{ env.ECR_URI }}:${{ env.IMAGE_TAG }}",
                   "cpu": 0,
                   "essential": true,
                   "portMappings": [

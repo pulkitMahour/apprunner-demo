@@ -48,7 +48,7 @@ async function startServer() {
 	await loadSecret();
 
 	app.get("/healthz", (req, res) => {
-		res.send('ok  try "/pulkit" endpoint');
+		res.status(200).send('ok');
 	});
 
 	app.use(express.static(path.join(__dirname, "public")));

@@ -64,7 +64,6 @@ jobs:
               "containerDefinitions": [
                 {
                   "name": "my-app",
-                  "image": "${{ env.ECR_URI }}:${{ env.IMAGE_TAG }}",
                   "cpu": 0,
                   "essential": true,
                   "portMappings": [
@@ -78,7 +77,8 @@ jobs:
                     "options": {
                       "awslogs-group": "/ecs/my-nodejs-task",
                       "awslogs-create-group": "true",
-                      "awslogs-region": "ap-southeast-1"
+                      "awslogs-region": "ap-southeast-1",
+                      "awslogs-stream-prefix": "ecs"
                     }
                   }
                 }
